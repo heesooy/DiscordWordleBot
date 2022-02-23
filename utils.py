@@ -14,3 +14,12 @@ def get_answer_list():
       answer_list[date.date()] = line[1]
   
   return answer_list
+
+def get_insults_list():
+  insult_list = []
+  with open('./not_bot/insults.txt', 'r') as insults:
+    for line in insults:
+      line = line.strip()
+      insult_list.append(line)
+
+  return insult_list

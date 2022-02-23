@@ -21,5 +21,22 @@ class AnswersCog(commands.Cog):
       await ctx.send("You stupid.")
       await ctx.message.delete()
 
+  @commands.command('record')
+  async def record(self, ctx, *args):
+    if ctx.channel.name != "wordle":
+      return
+    guesses = args[2][0]
+    await ctx.send(f"It took you {guesses} guesses!")
+  
+  @commands.Cog.listener()
+  async def on_message(self, message):
+    if message.channel.name != "wordle":
+      return
+    if message.content.startswith("Wordle"):
+      m = message.content.split(' ')
+      print(m)
+      await message.channel.send(m[2][0] + " guesses!")
+
+
 def setup(bot):
   bot.add_cog(AnswersCog(bot))
