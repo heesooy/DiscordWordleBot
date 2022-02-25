@@ -71,7 +71,7 @@ class AnswersCog(commands.Cog):
       stats = m[2][5:]
       tri = self.convertToTrinary(stats)
       if record_to_wordle_record(message, tri, num_guesses, utils.now().date()) == None:
-        await message.channel.send("If you have already answered, stop trying again! \n \n Otherwise, please use `!answer` to verify your answer first.")
+        await message.channel.send("If you have already answered, stop trying again! \n \n Otherwise, please use `!answer <todays word>` to verify your answer first.")
         return
       await message.channel.send("Recorded " + m[2][0] + f" guesses on Wordle #**{m[1]}**!")
 
