@@ -16,7 +16,7 @@ def get_answer_list():
       line = line.split(' ')
       date = datetime.strptime(line[0], "%Y-%m-%d")
 
-      answer_list[date.date()] = (line[1], line[2])
+      answer_list[date.date()] = (line[1], int(line[2]))
   
   return answer_list
 
