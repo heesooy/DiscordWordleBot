@@ -1,6 +1,11 @@
 from datetime import datetime, date
 from pytz import timezone
 
+def now():
+    tz = timezone('US/Eastern')
+    now = datetime.now(tz)
+    return now
+
 def get_answer_list():
 
   answer_list = {}
@@ -11,7 +16,7 @@ def get_answer_list():
       line = line.split(' ')
       date = datetime.strptime(line[0], "%Y-%m-%d")
 
-      answer_list[date.date()] = line[1]
+      answer_list[date.date()] = (line[1], line[2])
   
   return answer_list
 

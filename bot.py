@@ -22,7 +22,8 @@ async def on_ready():
 async def ping(ctx):
   await ctx.send("Pong!")
   tz = timezone('EST')
-  await ctx.send(datetime.now(tz))
+  now = datetime.now(tz)
+  await ctx.send(now)
 
 @bot.command()
 @commands.is_owner() 
