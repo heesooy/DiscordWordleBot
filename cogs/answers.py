@@ -64,6 +64,9 @@ class AnswersCog(commands.Cog):
       return
     if message.content.startswith("Wordle"):
       m = message.content.split(' ')
+      if len(m) != 3:
+        await message.channel.send("Don't be a dick and try to break the bot...")
+        return
       num_guesses = int(m[2][0])
       stats = m[2][5:]
       tri = self.convertToTrinary(stats)
