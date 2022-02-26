@@ -7,7 +7,7 @@ from pytz import timezone
 dotenv.load_dotenv()
 
 intents = discord.Intents(members=True, messages=True, reactions=True, guilds=True)
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
 for filename in os.listdir("./cogs"): # Change "cogs" to your folder name
     if filename.endswith(".py"):
@@ -33,5 +33,15 @@ async def restart(ctx):
       cog = f"cogs.{filename[:-3]}"
       bot.reload_extension(cog)
   await ctx.send("Reloading...")
+
+@bot.command()
+async def help(ctx):
+  color = int('0xebc334', base=16)
+  embed = discord.Embed(title="Command List", description="How to use this bot!", color=color)
+  wordle = '<#945166606613508176>'
+  embed.add_field(name="Recording an answer", value="Copy paste your Wordle Copy Pasta into " + wordle + ". You can only answer the current days wordle based on EST.", inline=False)
+  embed.add_field(name="!answer", value="Deprecated", inline=True)
+  embed.add_field(name="!record", value="Deprecated", inline=True)
+  await ctx.send(embed=embed)
 
 bot.run(f"{os.getenv('ENV')}")
