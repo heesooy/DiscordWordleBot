@@ -6,22 +6,24 @@ import utils
 
 class AnswersCog(commands.Cog):
   def __init__(self, bot):
-    self.answers = utils.get_answer_list()
+    self.answers_by_date, self.answers_by_number = utils.get_answer_list()
 
-  def get_answer(self, date):
-    return self.answers[date]
+  def get_answer_by_date(self, date):
+    return self.answers_by_date[date]
+  def get_answer_by_number(self, num):
+    return self.answers_by_number[num]
 
   def convertToTrinary(self, record):
     trinary = ""
     guesses = record.split('\n')
     for guess in guesses:
       for letter in guess:
-        if letter == '⬛':
-          trinary += '0'
-        elif letter == '🟨':
+        if letter == '🟨' or letter == '🟦':
           trinary += '1'
-        elif letter == '🟩':
+        elif letter == '🟩' or letter == '🟧':
           trinary += '2'
+        else: 
+          trinary += '0'
     return trinary
 
   def convertFromTrinary(self, record):
@@ -39,24 +41,26 @@ class AnswersCog(commands.Cog):
 
 
   @commands.command('answer')
-  async def answer(self, ctx, word):
-    answer = self.get_answer(utils.now().date())
-    if word == answer[0]:
-      await ctx.send("Thats it! Copy paste your Wordle guess thing!")
-      insert_wordle_record(ctx, answer)
-      await ctx.message.delete()
-    else:
-      await ctx.send("You stupid.")
-      await ctx.message.delete()
+  async def answer(self, ctx):
+    await ctx.send("Apparently this sends notifs w the answer to people so uh, don't use this. Just paste ur copy pasta.")
+    return
+    # answer = self.get_answer(utils.now().date())
+    # if word == answer[0]:
+    #   await ctx.send("Thats it! Copy paste your Wordle guess thing!")
+    #   insert_wordle_record(ctx, answer)
+    #   await ctx.message.delete()
+    # else:
+    #   await ctx.send("You stupid.")
+    #   await ctx.message.delete()
 
   @commands.command('record')
   async def record(self, ctx, *args):
     await ctx.channel.send("Dont use this!")
     return
-    if ctx.channel.name != "wordle":
-      return
-    guesses = args[2][0]
-    await ctx.send(f"It took you {guesses} guesses!")
+    # if ctx.channel.name != "wordle":
+    #   return
+    # guesses = args[2][0]
+    # await ctx.send(f"It took you {guesses} guesses!")
   
   @commands.Cog.listener()
   async def on_message(self, message):
@@ -68,10 +72,15 @@ class AnswersCog(commands.Cog):
         await message.channel.send("Don't be a dick and try to break the bot...")
         return
       num_guesses = int(m[2][0])
+      wordle_num = int(m[1])
       stats = m[2][5:]
       tri = self.convertToTrinary(stats)
-      if record_to_wordle_record(message, tri, num_guesses, utils.now().date()) == None:
-        await message.channel.send("If you have already answered, stop trying again! \n \n Otherwise, please use `!answer <todays word>` to verify your answer first.")
+      answer = self.get_answer_by_number(wordle_num)
+      if answer[0] != utils.now().date():
+        await message.channel.send("You cannot answer for a previous day!")
+        return
+      if insert_wordle_record(message, answer, tri, num_guesses) == None:
+        await message.channel.send("You have already answered for this day!")
         return
       await message.channel.send("Recorded " + m[2][0] + f" guesses on Wordle #**{m[1]}**!")
 
@@ -79,7 +88,7 @@ class AnswersCog(commands.Cog):
   async def stats(self, ctx):
     guesses = get_average_num_guesses(ctx.author)
     if guesses == None:
-      await ctx.send("You have not made any guesses. Use `!answer` to answer todays Wordle")
+      await ctx.send("You have not made any guesses. Paste your thing!")
       return
     await ctx.send(f"You have averaged **{guesses}** guesses per Wordle!")
   
