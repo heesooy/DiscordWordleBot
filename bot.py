@@ -37,9 +37,10 @@ async def restart(ctx):
 @bot.command()
 async def help(ctx):
   color = int('0xebc334', base=16)
-  embed = discord.Embed(title="Command List", description="How to use this bot!", color=color)
+  embed = discord.Embed(title="Command List", description="How to use this bot!", color=color, timestamp=datetime.utcnow())
   wordle = '<#945166606613508176>'
   embed.add_field(name="Recording an answer", value="Copy paste your Wordle Copy Pasta into " + wordle + ". You can only answer the current days wordle based on EST.", inline=False)
+  embed.add_field(name="!stats", value="See your own answering stats.", inline=False)
   embed.add_field(name="!answer", value="Deprecated", inline=True)
   embed.add_field(name="!record", value="Deprecated", inline=True)
   await ctx.send(embed=embed)
