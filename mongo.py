@@ -13,14 +13,14 @@ class State(Enum):
   ANSWERED = 1
   RECORDED = 2
 
-def insert_wordle_record(ctx, answer, tri, num):
-  if recordCollection.find_one({"user_id": ctx.author.id, "date": str(utils.now().date())}) != None:
+def insert_wordle_record(guild, answer, tri, num, date, user):
+  if recordCollection.find_one({"user_id": user.id, "date": str(date)}) != None:
     return None
   record = {
-    "user_id": ctx.author.id, 
-    "user_name": ctx.author.name, 
-    "guild_id": ctx.guild.id, 
-    "guild_name": ctx.guild.name,
+    "user_id": user.id, 
+    "user_name": user.name, 
+    "guild_id": guild.id, 
+    "guild_name": guild.name,
     "word": answer[1],
     "wordle_num": answer[2],
     "date": str(answer[0]),

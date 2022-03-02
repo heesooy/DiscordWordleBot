@@ -13,6 +13,15 @@ class AnswersCog(commands.Cog):
   def get_answer_by_number(self, num):
     return self.answers_by_number[num]
 
+  def parse_wordle(self, msg):
+    m = msg.split(' ')
+    if len(m) != 3:
+      return None
+    num_guesses = int(m[2][0])
+    wordle_num = int(m[1])
+    stats = m[2][5:]
+    return (num_guesses, wordle_num, stats)
+
   def convertToTrinary(self, record):
     trinary = ""
     guesses = record.split('\n')
@@ -54,9 +63,22 @@ class AnswersCog(commands.Cog):
     #   await ctx.message.delete()
 
   @commands.command('record')
+  @commands.is_owner()
   async def record(self, ctx, *args):
-    await ctx.channel.send("Dont use this!")
-    return
+    if len(ctx.message.mentions) == 0:
+      await ctx.channel.send("MENTION EMPTY")
+      return
+    msg = ctx.message.content
+    msg = msg[msg.index('>') + 2:]
+    split = self.parse_wordle(msg)
+    user = ctx.message.mentions[0]
+    (num_guesses, wordle_num, stats) = split
+    tri = self.convertToTrinary(stats)
+    answer = self.get_answer_by_number(wordle_num)
+    if insert_wordle_record(ctx.guild, answer, tri, num_guesses, answer[0], user) == None:
+      await ctx.send("Record exists for this day.")
+      return
+    await ctx.send("Recorded!")
     # if ctx.channel.name != "wordle":
     #   return
     # guesses = args[2][0]
@@ -67,22 +89,20 @@ class AnswersCog(commands.Cog):
     if message.channel.name != "wordle" and message.channel.name != "bot-testing":
       return
     if message.content.startswith("Wordle"):
-      m = message.content.split(' ')
-      if len(m) != 3:
+      split = self.parse_wordle(message.content)
+      if split == None:
         await message.channel.send("Don't be a dick and try to break the bot...")
         return
-      num_guesses = int(m[2][0])
-      wordle_num = int(m[1])
-      stats = m[2][5:]
+      (num_guesses, wordle_num, stats) = split
       tri = self.convertToTrinary(stats)
       answer = self.get_answer_by_number(wordle_num)
       if answer[0] != utils.now().date():
         await message.channel.send("You cannot answer for a previous day!")
         return
-      if insert_wordle_record(message, answer, tri, num_guesses) == None:
+      if insert_wordle_record(message.guild, answer, tri, num_guesses, utils.now().date(), message.author) == None:
         await message.channel.send("You have already answered for this day!")
         return
-      await message.channel.send("Recorded " + m[2][0] + f" guesses on Wordle #**{m[1]}**!")
+      await message.channel.send("Recorded " + str(num_guesses) + f" guesses on Wordle #**{wordle_num}**!")
 
   @commands.command('stats')
   async def stats(self, ctx):
