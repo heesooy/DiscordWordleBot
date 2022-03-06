@@ -1,8 +1,10 @@
 from datetime import datetime
 from discord.ext import commands
+import discord
 from pytz import timezone
 from mongo import *
 import utils
+import operator
 
 class AnswersCog(commands.Cog):
   def __init__(self, bot):
@@ -48,6 +50,31 @@ class AnswersCog(commands.Cog):
         guesses += '\n'
     return guesses
 
+  async def generateLeaderBoard(self, guild):
+    color = int('0xebc334', base=16)
+    embed = discord.Embed(title='Leaderboard', color=color, timestamp=datetime.utcnow())
+    users = get_user_list(guild)
+    # Highest Answers
+    stats = {}
+    for user in users:
+      stats[user] = (get_answer_count(user), get_average_num_guesses(user))
+    most = max(stats.items(), key=lambda elem: elem[1][0])
+    mostAnswerer = guild.get_member(most[0])
+    mostAnswers = most[1][0]
+    embed.add_field(name="Highest Participation!", value=f"{mostAnswerer.name} has the most answers with {mostAnswers}!", inline=False)
+    # Sweaty Guesser
+    filtered = list(filter(lambda elem: elem[1][0] >= 3, stats.copy().items()))
+    sweat = min(filtered, key=lambda elem: elem[1][1])
+    sweatiest = guild.get_member(sweat[0])
+    sweatiestGuesses = round(sweat[1][1], 1)
+    embed.add_field(name="Sweatiest Guesser", value=f"{sweatiest.name} is the sweatiest guesser with {sweatiestGuesses} guesses on average!", inline=False )
+    # Shitty Guesser
+    shitt = max(filtered, key=lambda elem: elem[1][1])
+    shittiest = guild.get_member(shitt[0])
+    shittiestGuesses = round(shitt[1][1],1)
+    embed.add_field(name="Shittiest Guesser (sorry! be better!)", value=f"{shittiest.name} is the shittiest guesser with {shittiestGuesses} guesses on average!", inline=False )
+    
+    return embed
 
   @commands.command('answer')
   async def answer(self, ctx):
@@ -106,11 +133,15 @@ class AnswersCog(commands.Cog):
 
   @commands.command('stats')
   async def stats(self, ctx):
-    guesses = get_average_num_guesses(ctx.author)
+    print('stats')
+    guesses = get_average_num_guesses(ctx.author.id)
     if guesses == None:
       await ctx.send("You have not made any guesses. Paste your thing!")
       return
     await ctx.send(f"You have averaged **{guesses}** guesses per Wordle!")
+
+    embed = await self.generateLeaderBoard(ctx.guild)
+    await ctx.send(embed=embed)
   
 def setup(bot):
   bot.add_cog(AnswersCog(bot))

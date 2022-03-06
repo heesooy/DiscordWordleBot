@@ -31,6 +31,14 @@ def insert_wordle_record(guild, answer, tri, num, date, user):
   insert = recordCollection.insert_one(record)
   return insert
 
+def get_user_list(guild):
+  users = recordCollection.distinct('user_id', {'guild_id': guild.id})
+  return users
+
+def get_answer_count(userid):
+  query = {"user_id": userid, "state": State.RECORDED.value}
+  return recordCollection.count_documents(query)
+
 def get_all_user_wordle_records(userid):
   query = {"user_id": userid, "state": State.RECORDED.value}
   if recordCollection.count_documents(query) == 0:
@@ -38,8 +46,8 @@ def get_all_user_wordle_records(userid):
   records = recordCollection.find(query)
   return records
 
-def get_average_num_guesses(user):
-  records = get_all_user_wordle_records(user.id)
+def get_average_num_guesses(userid):
+  records = get_all_user_wordle_records(userid)
   if records == None:
     return None
   sum = 0
