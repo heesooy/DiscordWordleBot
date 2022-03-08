@@ -58,22 +58,22 @@ class AnswersCog(commands.Cog):
     stats = {}
     for user in users:
       stats[user] = (get_answer_count(user), get_average_num_guesses(user))
-    most = max(stats.items(), key=lambda elem: elem[1][0])
-    mostAnswerer = guild.get_member(most[0])
-    mostAnswers = most[1][0]
-    embed.add_field(name="Highest Participation!", value=f"{mostAnswerer.name} has the most answers with {mostAnswers}!", inline=False)
-    # Sweaty Guesser
-    filtered = list(filter(lambda elem: elem[1][0] >= 3, stats.copy().items()))
-    sweat = min(filtered, key=lambda elem: elem[1][1])
-    sweatiest = guild.get_member(sweat[0])
-    sweatiestGuesses = round(sweat[1][1], 1)
-    embed.add_field(name="Sweatiest Guesser", value=f"{sweatiest.name} is the sweatiest guesser with {sweatiestGuesses} guesses on average!", inline=False )
-    # Shitty Guesser
-    shitt = max(filtered, key=lambda elem: elem[1][1])
-    shittiest = guild.get_member(shitt[0])
-    shittiestGuesses = round(shitt[1][1],1)
-    embed.add_field(name="Shittiest Guesser (sorry! be better!)", value=f"{shittiest.name} is the shittiest guesser with {shittiestGuesses} guesses on average!", inline=False )
-    
+
+    user_names = []
+    counts = []
+    averages = []
+    i = 1
+    for e in sorted(stats.items(), key = lambda elem: elem[1][1]):
+      user = guild.get_member(e[0])
+      count = e[1][0]
+      average = e[1][1]
+      user_names.append(f"{i} - {user.name}")
+      counts.append(f"{count}")
+      averages.append(f"{round(average,1)}")
+      i += 1
+    embed.add_field(name="User", value = '\n'.join(user_names), inline=True)
+    embed.add_field(name="Guess Avg", value = '\n'.join(averages), inline=True)
+    embed.add_field(name="Play Count", value = '\n'.join(counts), inline=True)
     return embed
 
   @commands.command('answer')
@@ -135,11 +135,14 @@ class AnswersCog(commands.Cog):
   async def stats(self, ctx):
     print('stats')
     guesses = get_average_num_guesses(ctx.author.id)
+    count = get_answer_count(ctx.author.id)
     if guesses == None:
       await ctx.send("You have not made any guesses. Paste your thing!")
       return
-    await ctx.send(f"You have averaged **{guesses}** guesses per Wordle!")
+    await ctx.send(f"You have averaged **{guesses}** guesses over **{count}** Wordles!")
 
+  @commands.command('leaderboard')
+  async def leaderboard(self, ctx):
     embed = await self.generateLeaderBoard(ctx.guild)
     await ctx.send(embed=embed)
   
