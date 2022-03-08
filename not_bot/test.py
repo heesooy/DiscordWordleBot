@@ -1,9 +1,14 @@
-import operator
+import requests
 
-stats = {1: (2, 12, 3.3), 2:(11, 9, 2.0)}
-most = max(stats.items(), key=lambda elem: elem[1][2])
+url = "https://yfapi.net/v6/finance/quote"
 
-filtered = filter(lambda elem: elem[1][0] >= 3, stats.copy().items())
+querystring = {"symbols":"FB"}
 
-for filt in filtered:
-  print(filt)
+headers = {
+    'x-api-key': "Nnabxc8ja99sUulupqgqE9mEdLbEu28v2jrP0Zbz"
+    }
+
+response = requests.request("GET", url, headers=headers, params=querystring)
+json = response.json()
+print(json['quoteResponse']['result'])
+print(json['quoteResponse']['result'][0]['preMarketPrice'])
