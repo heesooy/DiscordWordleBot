@@ -13,7 +13,7 @@ class StocksCog(commands.Cog):
     querystring = {"symbols":"FB"}
 
     headers = {
-        'x-api-key': "Nnabxc8ja99sUulupqgqE9mEdLbEu28v2jrP0Zbz"
+        'x-api-key': "Qkdfm9Y7nM8nxfbBay7JFae3qU7Kwjn95BrCoQ2x"
         }
 
     response = requests.request("GET", url, headers=headers, params=querystring)

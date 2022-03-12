@@ -139,7 +139,7 @@ class AnswersCog(commands.Cog):
     if guesses == None:
       await ctx.send("You have not made any guesses. Paste your thing!")
       return
-    await ctx.send(f"You have averaged **{guesses}** guesses over **{count}** Wordles!")
+    await ctx.send(f"You have averaged **{round(guesses, 2)}** guesses over **{count}** Wordles!")
 
   @commands.command('leaderboard')
   async def leaderboard(self, ctx):
