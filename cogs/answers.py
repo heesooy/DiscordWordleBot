@@ -110,7 +110,7 @@ class AnswersCog(commands.Cog):
         answer = self.get_answer_by_number(wordle_num)
         if (
             insert_wordle_record(ctx.guild, answer, tri, num_guesses, answer[0], user)
-            == None
+            is None
         ):
             await ctx.send("Record exists for this day.")
             return
@@ -126,7 +126,7 @@ class AnswersCog(commands.Cog):
             return
         if message.content.startswith("Wordle"):
             split = self.parse_wordle(message.content)
-            if split == None:
+            if split is None:
                 await message.channel.send(
                     "Don't be a dick and try to break the bot..."
                 )
@@ -146,7 +146,7 @@ class AnswersCog(commands.Cog):
                     utils.now().date(),
                     message.author,
                 )
-                == None
+                is None
             ):
                 await message.channel.send("You have already answered for this day!")
                 return
@@ -161,7 +161,7 @@ class AnswersCog(commands.Cog):
         print("stats")
         guesses = get_average_num_guesses(ctx.author.id)
         count = get_answer_count(ctx.author.id)
-        if guesses == None:
+        if guesses is None:
             await ctx.send("You have not made any guesses. Paste your thing!")
             return
         await ctx.send(
